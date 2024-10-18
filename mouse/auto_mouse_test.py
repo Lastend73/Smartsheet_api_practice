@@ -10,12 +10,12 @@ for a in range(1,100):
 
     pyautogui.click(486,21)
 
-    pyautogui.sleep(15)
+    pyautogui.sleep(30)
 
     pyautogui.click(162,134)
     pyautogui.click(196,209)
 
-    pyautogui.sleep(5)
+    pyautogui.sleep(7)
     pyperclip.copy('갱신일')
     pyautogui.hotkey('ctrl', 'v')
     #pyautogui.write(["r","o","d","t","l","s","d","l","f"])
@@ -60,6 +60,6 @@ for a in range(1,100):
     pyautogui.sleep(1)
     pyautogui.click(114,76)
 
-    pyautogui.sleep(40)
+    pyautogui.sleep(60)
 
 #pyautogui.press("f5")
