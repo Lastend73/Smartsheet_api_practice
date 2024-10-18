@@ -2,7 +2,6 @@ import requests
 import pprint
 import smartsheet
 
-
 # 헤더 설정
 headers = {
     "Authorization": "Bearer jq7j4cRjxemFCK9klZ90M7cTYkHyv3qH0El41"
