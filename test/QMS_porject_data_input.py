@@ -128,7 +128,10 @@ for input_sheetId in folder_name_list :
 
     rag_ref_url = f"https://api.smartsheet.com/2.0/sheets/{main_sheetId}/crosssheetreferences"
     rag_ref_response = requests.post(rag_ref_url, headers=headers, json=rag_data)
-
+    
+    if rag_ref_response.status_code != 200 :
+        print("50개 초과 정지")
+        break
 
     #reference 생성 및 추가{시정완료}
     for data in input_sheet_result['columns']:
@@ -192,6 +195,7 @@ for input_sheetId in folder_name_list :
     
     update_response = requests.put(main_sheet_url, headers=headers, json=cell_update_data)
     
+
 #    pprint.pprint(cell_update_data)
     print()
     print()
