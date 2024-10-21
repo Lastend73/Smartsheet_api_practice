@@ -1,9 +1,6 @@
 import requests
 import pprint
 
-headers = {
-    "Authorization": "Bearer jq7j4cRjxemFCK9klZ90M7cTYkHyv3qH0El41"
-}
 
 params = {
     "page": 1,
