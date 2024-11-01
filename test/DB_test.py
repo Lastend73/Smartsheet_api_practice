@@ -52,4 +52,4 @@ def deleteDB(schema,table,condition):
     except Exception as e:
         print( "delete DB err", e)
 
-readDB("public","Smartsheet","*")
+#readDB("public","Smartsheet","*")

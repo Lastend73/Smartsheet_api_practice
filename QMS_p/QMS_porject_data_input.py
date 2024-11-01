@@ -1,6 +1,9 @@
 import requests
 import pprint
 
+headers = {
+    "Authorization": "Bearer jq7j4cRjxemFCK9klZ90M7cTYkHyv3qH0El41"
+}
 
 params = {
     "page": 1,
@@ -12,24 +15,30 @@ folder_Id_lst = ['998115009423236','8122950357411716','8867519982266244','238596
 folder_name_list =[]
 
 for folder_Id in folder_Id_lst:
-    folder_url = f"https://api.smartsheet.com/2.0/folders/{folder_Id}"
+    folder_url = f"https://api.smartsheet.com/2.0/folders/{folder_Id}"  
     folder_response = requests.get(folder_url, headers=headers, params=params)
-    folder_result = folder_response.json()
-    folder_datas= folder_result['sheets']
+    folder_result = folder_response.json()['sheets']
+    # folder_datas= folder_result['sheets']
     
-    for folder_data in folder_datas :
+    for folder_data in folder_result :
         folder_name_list.append(folder_data['id'])
 
-# 입력될 시트 정보 
-main_sheetId ='5018999150563204'
-main_sheet_url = f"https://api.smartsheet.com/2.0/sheets/{main_sheetId}"
-main_sheet_response = requests.get(main_sheet_url, headers=headers, params=params)
-main_sheet_results = main_sheet_response.json()["columns"]
+count_input_num = 0
 
 # 입력할 연결할 시트 정보 
 for input_sheetId in folder_name_list :
+    #50 개 단위로 끊기
+    if count_input_num%50 == 0 :
+        main_sheetId =['5461036178034564','5668977019670404','8695696307736452','3630521116479364']
+        main_sheetId = main_sheetId[int(count_input_num/50)]
+        main_sheet_url = f"https://api.smartsheet.com/2.0/sheets/{main_sheetId}"
+        pprint.pprint(main_sheet_url)
+        main_sheet_response = requests.get(main_sheet_url, headers=headers, params=params)
+        main_sheet_results = main_sheet_response.json()["columns"]
+        print("sheet change")
+
     main_sheet_colunm_info = []
-    #input_sheetId = folder_name_list[0]
+    #input_sheetId = folder_name_list[0]    
 
     updata_data_cells_lst = [] # 업데이트(연결)될 cells 리스트
     input_sheet_url = f"https://api.smartsheet.com/2.0/sheets/{input_sheetId}"
@@ -125,6 +134,10 @@ for input_sheetId in folder_name_list :
 
     rag_ref_url = f"https://api.smartsheet.com/2.0/sheets/{main_sheetId}/crosssheetreferences"
     rag_ref_response = requests.post(rag_ref_url, headers=headers, json=rag_data)
+    if rag_ref_response.status_code == 200:
+        print()
+    else :
+        print(rag_ref_response.json())
     
     if rag_ref_response.status_code != 200 :
         print("50개 초과 정지")
@@ -149,7 +162,12 @@ for input_sheetId in folder_name_list :
                     
     finish_check_url = f"https://api.smartsheet.com/2.0/sheets/{main_sheetId}/crosssheetreferences"
     finish_check_response = requests.post(finish_check_url, headers=headers, json=finsh_check_data)
-    pprint.pprint(finish_check_response.json())
+    if finish_check_response.status_code == 200:
+        print()
+    else :
+        print(update_response.json())
+    
+    #pprint.pprint(finish_check_response.json())
     #COUNTR
 
     RAG_value = "{RAG"+get_row_number+"}"
@@ -181,7 +199,7 @@ for input_sheetId in folder_name_list :
                     {
                     "columnId": i['id'], #수정 될 페이지의 컬럼 아이디
                     "value": "",
-                    "formula": f'=COUNTIF({fixed_complete_value}, "<>")'
+                    "formula": f'=IFERROR(COUNTIF(YEAR({fixed_complete_value}), ">0"), 0)'
                     }
                 )
 
@@ -191,13 +209,15 @@ for input_sheetId in folder_name_list :
         }
     
     update_response = requests.put(main_sheet_url, headers=headers, json=cell_update_data)
+    if update_response.status_code == 200:
+        print()
+    else :
+        print(update_response.json())
+    count_input_num +=1
     
 
 #    pprint.pprint(cell_update_data)
-    print()
-    print()
-    print()
-    print()
+
 
 
 
