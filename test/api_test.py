@@ -19,7 +19,7 @@ params = {"page": 1, "pageSize": 70}
 # }
 
 # API 엔드포인트
-main_sheetId = "1496711704825732"
+main_sheetId = "1641928844070788"
 smartsheetUrl = "https://api.smartsheet.com/2.0/sheets"
 
 smartsheet_client = smartsheet.Smartsheet("jq7j4cRjxemFCK9klZ90M7cTYkHyv3qH0El41")
@@ -32,80 +32,116 @@ response = requests.get(
 if response.status_code == 200:
 
     data = response.json()
-    pprint.pprint(data["columns"])
+    pprint.pprint(data["rows"][0])
+    main_person_column_id = data["columns"][10]['id'] #주 담당자 ID (모든 컬럼 추가된다음)
     link_data_list = []
 
-    # for link_data in data["rows"]:
-    #     # 기존에 링크된 시트들의 정보
-    #     cell_info = {}
-    #     cell_info["rowId"] = link_data["cells"][3]["linkInFromCell"]["rowId"]
-    #     cell_info["sheetId"] = link_data["cells"][3]["linkInFromCell"]["sheetId"]
-    #     cell_info["sheetName"] = link_data["cells"][3]["linkInFromCell"]["sheetName"]
+    for link_data in data["rows"]:
+        # 기존에 링크된 시트들의 정보
+        update_url = f"{smartsheetUrl}/{main_sheetId}/rows"
+        update_cell_list =[]
 
-    #     # 링크 추가할 데이터들의 컬럼 ID 모음 [요청부서, 진행상태, 주담당자,부담당자]
-    #     new_cell_response = requests.get(
-    #         f"{smartsheetUrl}/{cell_info["sheetId"]}", headers=headers, params=params
-    #     ).json()
-    #     new_cell_response = new_cell_response["columns"]
+        cell_info = {}
+        cell_info["rowId"] = link_data["cells"][3]["linkInFromCell"]["rowId"]
+        cell_info["sheetId"] = link_data["cells"][3]["linkInFromCell"]["sheetId"]
+        cell_info["sheetName"] = link_data["cells"][3]["linkInFromCell"]["sheetName"]
 
-    #     new_cell_id = {}
+        # 링크 추가할 데이터들의 컬럼 ID 모음 [요청부서, 진행상태, 주담당자,부담당자]
+        new_cell_response = requests.get(
+            f"{smartsheetUrl}/{cell_info["sheetId"]}", headers=headers, params=params).json()
+        new_cell_response = new_cell_response["columns"]
 
-    #     for new_data in new_cell_response:
-    #         if "요청부서" in new_data["title"]:
-    #             new_cell_id["요청부서"] = new_data["id"]
-    #         elif "진행상태" in new_data["title"]:
-    #             new_cell_id["진행상태"] = new_data["id"]
-    #         elif "주담당자" in new_data["title"]:
-    #             new_cell_id["주담당자"] = new_data["id"]
-    #         elif "부담당자" in new_data["title"]:
-    #             new_cell_id["부담당자"] = new_data["id"]
+        new_cell_id = {}
+
+
+
+        for new_data in new_cell_response:
+            if "요청부서" in new_data["title"]:
+                new_cell_id["요청부서"] = new_data["id"]
+            elif "진행상태" in new_data["title"]:
+                new_cell_id["진행상태"] = new_data["id"]
+            elif "주담당자" in new_data["title"]:
+                new_cell_id["주담당자"] = new_data["id"]
+            elif "부담당자" in new_data["title"]:
+                new_cell_id["부담당자"] = new_data["id"]
         
-    #     cell_info["New data"] = new_cell_id
+        
+        
+        cell_update_data = {
+                "id": link_data['id'],
+                "cells": [{
+                    "columnId": main_sheet_goal_id, #수정 될 페이지의 컬럼 아이디
+                    "value": "",
+                    "linkInFromCell":{
+                        "rowId" :  cell_info["rowId"],
+                        "columnId" : new_cell_id["요청부서"],
+                        'sheetId' : cell_info["sheetName"] # 연결되 시트아이디
+                    }
+                }
+                ]
+            }
+        
+        response = requests.put(
+            update_url, headers=headers, json=cell_update_data
+        )
+        
+        # cell_info["New data"] = new_cell_id
 
-    #     link_data_list.append(cell_info)
+        # link_data_list.append(cell_info)
 
-    pprint.pprint(link_data_list)
+    # pprint.pprint(link_data_list[0])
 
-    input_column1 = smartsheet.models.Column(
-        {
-            "title": "요청부서",
-            "type": "TEXT_NUMBER",
-            "index": 4,
-        }
-    )
-    input_column_result = smartsheet_client.Sheets.add_columns(
-        1496711704825732, [input_column1]  # sheet_id
-    )
-    input_column2 = smartsheet.models.Column(
-        {
-            "title": "진행상태",
-            "type": "TEXT_NUMBER",
-            "index": 9,
-        }
-    )
+    # input_column1 = smartsheet.models.Column(
+    #     {
+    #         "title": "요청부서",
+    #         "type": "TEXT_NUMBER",
+    #         "index": 4,
+    #     }
+    # )
+    # input_column_result = smartsheet_client.Sheets.add_columns(
+    #     main_sheetId, [input_column1]  # sheet_id
+    # )
 
-    input_column_result = smartsheet_client.Sheets.add_columns(
-        1496711704825732, [input_column2]  # sheet_id
-    )
+    # input_column2 = smartsheet.models.Column(
+    #     {
+    #         "title": "진행상태",
+    #         "type": "TEXT_NUMBER",
+    #         "index": 9,
+    #     }
+    # )
+    # input_column_result = smartsheet_client.Sheets.add_columns(
+    #     main_sheetId, [input_column2]  # sheet_id
+    # )
 
-    input_column3 = smartsheet.models.Column(
-        {
-            "title": "부담당자",
-            "type": "TEXT_NUMBER",
-            "index": 11,
-        }
-    )
+    # input_column3 = smartsheet.models.Column(
+    #     {
+    #         "title": "부담당자",
+    #         "type": "TEXT_NUMBER",
+    #         "index": 11,
+    #     }
+    # )
+    # input_column_result = smartsheet_client.Sheets.add_columns(
+    #     main_sheetId, [input_column3]  # sheet_id
+    # )
 
-    input_column_result = smartsheet_client.Sheets.add_columns(
-        1496711704825732, [input_column3]  # sheet_id
-    )
+    # pprint.pprint(input_column_result.to_dict()["data"][0]["id"])
+ 
+    # update_column = smartsheet.models.Column(
+    #     {
+    #         "width" : 150,
+    #         "hidden" : False,
+    #     }
+    # )
 
-    update_column = smartsheet.models.Column(
-        {
-            "width" : 150,
-            "hidden" : False,
-        }
-    )
+    # response = smartsheet_client.Sheets.update_column(
+    #     main_sheetId,       # sheet_id
+    #     main_person_column_id,       # column_id
+    #     update_column)
     
-else:
-    print("요청 실패:", response.text)
+    
+
+    # pprint.pprint(response.json())
+
+    
+# else:
+    # print("요청 실패:", response.text)
