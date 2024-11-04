@@ -1,3 +1,7 @@
+# 24/11/04 요청부서, 주담당자,부담당자,진행상태  추가 및 링크 걸기
+# 전체 프로젝트 제외 (RF, ETC ,Lazer, HIFU, IPL)
+
+
 import requests
 import pprint
 import smartsheet
@@ -6,7 +10,7 @@ import smartsheet
 headers = {
     "Authorization": "Bearer jq7j4cRjxemFCK9klZ90M7cTYkHyv3qH0El41",
     "Content-Type": "application/json",
-}
+} 
 
 
 params = {"page": 1, "pageSize": 70}

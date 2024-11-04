@@ -43,7 +43,7 @@ def get_sheet_ids(base_url, folder_id):
                     column2 = smartsheet.models.Column(
                         {
                             "title": "주담당자",
-                            "type": "TEXT_NUMBER",
+                            "type": "CONTACT_LIST",
                             "index": 100,
                             "hidden": True,
                         }
@@ -52,7 +52,7 @@ def get_sheet_ids(base_url, folder_id):
                     column3 = smartsheet.models.Column(
                         {
                             "title": "부담당자",
-                            "type": "TEXT_NUMBER",
+                            "type": "CONTACT_LIST",
                             "index": 100,
                             "hidden": True,
                         }
